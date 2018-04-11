@@ -2,4 +2,6 @@
     <string name="app_name">VisEq</string>
     <string name="camera_permission_confirmation">This app needs to use the camera in order to see the equation. No images or recordings taken will be saved unless done so by you, or sent anywhere off the device.</string>
     <string name="camera_permission_not_granted">This app cannot operate without access to the camera.</string>
+    <string name="equation_placeholder">Some Equation Placeholder</string>
+    <string name="reticle_label">Center equation here</string>
 </resources>

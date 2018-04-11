@@ -16,6 +16,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.cameraview.CameraView;
@@ -37,6 +38,10 @@ public class MainActivity extends AppCompatActivity implements
         cameraView.addCallback(cameraCallback);
         cameraView.setFacing(CameraView.FACING_BACK);  // Back == Away from screen.
         cameraView.setFlash(CameraView.FLASH_OFF);
+        cameraView.setOnClickListener(onClickListener);
+
+        EquationPlot equationPlot = findViewById(R.id.plot);
+        equationPlot.makeTransparent();
     }
 
     @Override
@@ -128,6 +133,21 @@ public class MainActivity extends AppCompatActivity implements
             getBackgroundHandler().post(() -> {
                 // todo
             });
+        }
+    };
+
+    /**
+     * Handles clicks made on widgets within this activity.
+     */
+    private View.OnClickListener onClickListener = view -> {
+        switch (view.getId()) {
+            case R.id.camera:
+                if (cameraView != null) {
+                    cameraView.takePicture();
+                } else {
+                    Log.d(TAG, "Attempted to take photo, but cameraView was null.");
+                }
+                break;
         }
     };
 

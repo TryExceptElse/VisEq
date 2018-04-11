@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="tryexceptelse.viseq.MainActivity">
+        <activity android:name="tryexceptelse.viseq.MainActivity"
+            android:screenOrientation="portrait">  <!-- Lock in portrait mode -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />

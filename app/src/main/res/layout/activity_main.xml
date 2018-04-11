@@ -1,27 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ap="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="tryexceptelse.viseq.MainActivity">
 
-    <com.google.android.cameraview.CameraView
-        android:id="@+id/camera"
+    <!--
+        Use a frame layout to ensure other widgets appear on top of CameraView.
+        Later elements in a FrameView will appear on top of earlier ones. -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:keepScreenOn="true"
-        android:adjustViewBounds="true"
-        app:autoFocus="true"
-        app:aspectRatio="4:3"
-        app:facing="back"
-        app:flash="auto"/>
+        android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_alignParentLeft="true"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        <com.google.android.cameraview.CameraView
+            android:id="@+id/camera"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:keepScreenOn="true"
+            app:aspectRatio="4:3"
+            app:autoFocus="true"
+            app:facing="back"
+            app:flash="auto" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            ap:layout_constraintBottom_toBottomOf="parent"
+            ap:layout_constraintEnd_toEndOf="parent"
+            ap:layout_constraintStart_toStartOf="parent"
+            ap:layout_constraintTop_toBottomOf="@+id/camera">
+
+            <tryexceptelse.viseq.EquationPlot
+                android:id="@+id/plot"
+                style="@style/APDefacto.Dark"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.33"
+                ap:layout_constraintEnd_toEndOf="parent"
+                ap:layout_constraintHorizontal_bias="0.502"
+                ap:backgroundColor="@color/ap_transparent"
+                ap:graphBackgroundColor="@color/ap_transparent"
+                ap:lineLabelRotationBottom="-45"
+                ap:lineLabels="left|bottom"
+                ap:rangeTitle="Y Placeholder"
+                ap:title="Equation Graph"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.16" />
+
+            <TextView
+                android:id="@+id/equationReadout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/equation_placeholder"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:background="#66AAAAAA"
+                android:textColor="#FFFFFF"/>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.16" />
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:layout_editor_absoluteX="0dp" />
+
+        </LinearLayout>
+
+        <!-- Use a RelativeLayout to help center reticle. -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <View
+                android:id="@+id/equation_reticle"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_centerInParent="true"
+                android:background="#66aaaaaa"
+                android:visibility="visible" />
+
+            <TextView
+                android:id="@+id/reticle_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_alignParentStart="true"
+                android:text="@string/reticle_label"
+                android:textAlignment="center"
+                android:textColor="#EEEEEE"
+                android:textSize="16sp" />
+        </RelativeLayout>
+
+    </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>
