@@ -20,7 +20,8 @@ import android.widget.Toast;
 
 import com.google.android.cameraview.CameraView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+        ActivityCompat.OnRequestPermissionsResultCallback {
     private static final String TAG = "MainActivity";
     private static final String CONFIRMATION_FRAGMENT_DIALOG_TAG = "ConfirmationDialog";
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 1;
@@ -106,17 +107,17 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onCameraOpened(CameraView cameraView) {
-            Log.d(TAG, "camera opened");
+            Log.d(TAG, "Camera opened.");
         }
 
         @Override
         public void onCameraClosed(CameraView cameraView) {
-            Log.d(TAG, "camera closed");
+            Log.d(TAG, "Camera closed.");
         }
 
         @Override
         public void onPictureTaken(CameraView cameraView, final byte[] data) {
-            Log.d(TAG, "onPictureTaken " + data.length);
+            Log.d(TAG, "Picture Taken." + data.length);
 
             getBackgroundHandler().post(() -> {
                 // todo
@@ -199,6 +200,5 @@ public class MainActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show())
                     .create();
         }
-
     }
 }
