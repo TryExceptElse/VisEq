@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "Created");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         cameraView = findViewById(R.id.camera);
@@ -40,12 +41,14 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onResume() {
+        Log.d(TAG, "Resumed");
         super.onResume();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
                 PackageManager.PERMISSION_GRANTED) {
             if (cameraView == null) {
                 throw new IllegalStateException("cameraView == null");
             }
+            Log.d(TAG, "Restarting Camera View");
             cameraView.start();
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.CAMERA)) {
@@ -66,13 +69,16 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onPause() {
+        Log.d(TAG, "Paused");
         assert cameraView != null;
+        Log.d(TAG, "Stopping Camera View");
         cameraView.stop();
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
+        Log.d(TAG, "Destroyed");
         super.onDestroy();
         if (backgroundHandler != null) {
             backgroundHandler.getLooper().quitSafely();
