@@ -23,6 +23,7 @@ import com.google.android.cameraview.CameraView;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String CONFIRMATION_FRAGMENT_DIALOG_TAG = "ConfirmationDialog";
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 1;
     private @Nullable CameraView cameraView;
     private @Nullable Handler backgroundHandler;
 
@@ -30,9 +31,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // set camera
         cameraView = findViewById(R.id.camera);
         cameraView.addCallback(cameraCallback);
+        cameraView.setFacing(CameraView.FACING_BACK);  // Back == Away from screen.
+        cameraView.setFlash(CameraView.FLASH_OFF);
     }
 
     @Override
@@ -49,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
             ConfirmationDialogFragment
                     .newInstance(R.string.camera_permission_confirmation,
                             new String[]{Manifest.permission.CAMERA},
-                            1,
+                            CAMERA_PERMISSION_REQUEST_CODE,
                             R.string.camera_permission_not_granted)
                     .show(getSupportFragmentManager(), CONFIRMATION_FRAGMENT_DIALOG_TAG);
         } else {
@@ -58,6 +60,42 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.CAMERA},
                     1
             );
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        assert cameraView != null;
+        cameraView.stop();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (backgroundHandler != null) {
+            backgroundHandler.getLooper().quitSafely();
+            backgroundHandler = null;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case CAMERA_PERMISSION_REQUEST_CODE:
+                if (permissions.length != 1 || grantResults.length != 1) {
+                    throw new RuntimeException("Expected only a single permission & result.");
+                }
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(
+                            this,
+                            R.string.camera_permission_not_granted,
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+                // camera start handled by onResume
+                break;
         }
     }
 
