@@ -59,14 +59,14 @@
                 android:layout_weight="0.16" />
 
             <TextView
-                android:id="@+id/equationReadout"
+                android:id="@+id/equation_readout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="#66AAAAAA"
                 android:text="@string/equation_placeholder"
                 android:textAlignment="center"
-                android:textSize="18sp"
-                android:background="#66AAAAAA"
-                android:textColor="#FFFFFF"/>
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
 
             <Space
                 android:layout_width="match_parent"

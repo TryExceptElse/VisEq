@@ -37,4 +37,13 @@ public class EquationPlot extends XYPlot {
         graphWidget.getBackgroundPaint().setColor(color);
         graphWidget.getGridBackgroundPaint().setColor(color);
     }
+
+    /**
+     * Sets displayed equation.
+     * @param equation: String form of equation.
+     * @return boolean indicating whether passed String was valid or not.
+     */
+    boolean setEquation(String equation) {
+        return false;  // PLACEHOLDER
+    }
 }

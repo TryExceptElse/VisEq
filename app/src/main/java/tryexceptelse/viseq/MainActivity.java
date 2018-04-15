@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -17,17 +18,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.cameraview.CameraView;
+
+import java.lang.ref.WeakReference;
+
+import tryexceptelse.viseq.model.ImageParser;
 
 public class MainActivity extends AppCompatActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback {
     private static final String TAG = "MainActivity";
     private static final String CONFIRMATION_FRAGMENT_DIALOG_TAG = "ConfirmationDialog";
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 1;
-    private @Nullable CameraView cameraView;
-    private @Nullable Handler backgroundHandler;
+    private static final int IMAGE_PARSE_MESSAGE_CODE = 1;
+    private static final ImageParser imageParser = new ImageParser();
+    @Nullable private CameraView cameraView;
+    @Nullable private TextView equationReadout;
+    @Nullable private Handler backgroundHandler;
+    @Nullable private ParseResultMessageHandler parseResultMessageHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +50,12 @@ public class MainActivity extends AppCompatActivity implements
         cameraView.setFlash(CameraView.FLASH_OFF);
         cameraView.setOnClickListener(onClickListener);
 
+        equationReadout = findViewById(R.id.equation_readout);
+
         EquationPlot equationPlot = findViewById(R.id.plot);
         equationPlot.makeTransparent();
+
+        parseResultMessageHandler = new ParseResultMessageHandler(this);
     }
 
     @Override
@@ -131,7 +145,15 @@ public class MainActivity extends AppCompatActivity implements
             Log.d(TAG, "Picture Taken." + data.length);
 
             getBackgroundHandler().post(() -> {
-                // todo
+                ImageParser.ImageParseResult result = imageParser.parse(data);
+                Message msg = new Message();
+                msg.what = IMAGE_PARSE_MESSAGE_CODE;
+                msg.obj = result;
+                if (parseResultMessageHandler != null) {
+                    parseResultMessageHandler.sendMessage(msg);
+                } else {
+                    Log.d(TAG, "Attempted to send msg but parseResultMessageHandler was null");
+                }
             });
         }
     };
@@ -139,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * Handles clicks made on widgets within this activity.
      */
-    private View.OnClickListener onClickListener = view -> {
+    private final View.OnClickListener onClickListener = view -> {
         switch (view.getId()) {
             case R.id.camera:
                 if (cameraView != null) {
@@ -225,6 +247,33 @@ public class MainActivity extends AppCompatActivity implements
                                     args.getInt(ARG_NOT_GRANTED_MESSAGE),
                                     Toast.LENGTH_SHORT).show())
                     .create();
+        }
+    }
+
+    /**
+     * Class handling messages received from background thread
+     * containing results of image parsing, or other data.
+     */
+    private static class ParseResultMessageHandler extends Handler {
+        // hold a weak reference to prevent leaks
+        private WeakReference<MainActivity> activityReference;
+
+        ParseResultMessageHandler(MainActivity activity) {
+            activityReference = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case IMAGE_PARSE_MESSAGE_CODE:
+                    ImageParser.ImageParseResult result = (ImageParser.ImageParseResult) msg.obj;
+                    TextView equationReadout = activityReference.get().equationReadout;
+                    if (equationReadout != null) {
+                        equationReadout.setText(result.getEquation());
+                    }
+                    break;
+            }
+            super.handleMessage(msg);
         }
     }
 }
