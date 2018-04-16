@@ -33,11 +33,11 @@ public class ImageParser {
         ImageParseResult() {}
 
         /**
-         * Sets returned equation.
+         * Sets String equation that was the result of parsing the image data.
          * @param equation: String form of equation.
          * @return ImageParseResult
          */
-        ImageParseResult setEquation(@Nullable String equation) {
+        ImageParseResult setEquation(@Nullable final String equation) {
             this.equation = equation;
             return this;
         }

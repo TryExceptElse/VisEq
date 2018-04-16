@@ -2,6 +2,7 @@ package tryexceptelse.viseq;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -9,7 +10,7 @@ import com.androidplot.xy.XYGraphWidget;
 import com.androidplot.xy.XYPlot;
 
 /**
- * Class Handling plotting of equations
+ * Class Handling plotting of equations.
  */
 public class EquationPlot extends XYPlot {
     public EquationPlot(Context context, String title) {
@@ -28,6 +29,9 @@ public class EquationPlot extends XYPlot {
         super(context, attrs, defStyle);
     }
 
+    /**
+     * Sets graph background to be transparent.
+     */
     public void makeTransparent() {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         int color = Color.TRANSPARENT;
@@ -40,10 +44,10 @@ public class EquationPlot extends XYPlot {
 
     /**
      * Sets displayed equation.
-     * @param equation: String form of equation.
+     * @param equation: String form of equation, ex: "f(x) = 2x + 3".
      * @return boolean indicating whether passed String was valid or not.
      */
-    boolean setEquation(String equation) {
+    boolean setEquation(@NonNull final String equation) {
         return false;  // PLACEHOLDER
     }
 }
