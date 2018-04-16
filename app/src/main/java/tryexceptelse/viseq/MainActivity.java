@@ -29,18 +29,28 @@ import tryexceptelse.viseq.model.ImageParser;
 
 public class MainActivity extends AppCompatActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback {
+    // TAG used to identify activity or dialog for debugging and other
+    // internal uses. Not displayed to user.
     private static final String TAG = "MainActivity";
     private static final String CONFIRMATION_FRAGMENT_DIALOG_TAG = "ConfirmationDialog";
+
+    // Code integer used to identify the type of a message or
+    // message-like object.
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 1;
     private static final int IMAGE_PARSE_MESSAGE_CODE = 1;
+
     private static final ImageParser imageParser = new ImageParser();
     @Nullable private CameraView cameraView;
     @Nullable private TextView equationReadout;
     @Nullable private Handler backgroundHandler;
     @Nullable private ParseResultMessageHandler parseResultMessageHandler;
 
+    /**
+     * On creation, initializes fields, and finalizes ui construction.
+     * @param savedInstanceState Bundle
+     */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable final Bundle savedInstanceState) {
         Log.d(TAG, "Created");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -52,12 +62,17 @@ public class MainActivity extends AppCompatActivity implements
 
         equationReadout = findViewById(R.id.equation_readout);
 
-        EquationPlot equationPlot = findViewById(R.id.plot);
+        final EquationPlot equationPlot = findViewById(R.id.plot);
         equationPlot.makeTransparent();
 
         parseResultMessageHandler = new ParseResultMessageHandler(this);
     }
 
+    /**
+     * On resumption of activity, restarts camera if camera permission
+     * has been granted. Otherwise, shows
+     * {@link ConfirmationDialogFragment} requesting permission.
+     */
     @Override
     protected void onResume() {
         Log.d(TAG, "Resumed");
@@ -86,6 +101,10 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * When activity is paused, suspends any resource-significant
+     * operations, such as {@link CameraView}.
+     */
     @Override
     protected void onPause() {
         Log.d(TAG, "Paused");
@@ -95,6 +114,9 @@ public class MainActivity extends AppCompatActivity implements
         super.onPause();
     }
 
+    /**
+     * Cleans up activity before its destruction.
+     */
     @Override
     protected void onDestroy() {
         Log.d(TAG, "Destroyed");
@@ -105,9 +127,18 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * Called when results of a permission request have been received.
+     * @param requestCode: int identifying which permission request
+     *                   led to this call.
+     * @param permissions: String array of permissions requested.
+     * @param grantResults: int array of results.
+     */
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(
+            final int requestCode,
+            @NonNull final String[] permissions,
+            @NonNull final int[] grantResults) {
         switch (requestCode) {
             case CAMERA_PERMISSION_REQUEST_CODE:
                 if (permissions.length != 1 || grantResults.length != 1) {
@@ -126,27 +157,63 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Callback class handling camera events.
+     * Callback class handling camera events passed by {@link CameraView}.
      */
     private final CameraView.Callback cameraCallback = new CameraView.Callback() {
 
+        /**
+         * Called when camera is opened.
+         *
+         * @param cameraView The associated {@link CameraView}.
+         *                   This has been reported to be null on rare occasions,
+         *                   if an err occurs.
+         */
         @Override
-        public void onCameraOpened(CameraView cameraView) {
+        public void onCameraOpened(@Nullable CameraView cameraView) {
             Log.d(TAG, "Camera opened.");
         }
 
+        /**
+         * Called when camera is closed.
+         *
+         * @param cameraView The associated {@link CameraView}.
+         *                   This has been reported to be null on rare occasions,
+         *                   if an err occurs.
+         */
         @Override
-        public void onCameraClosed(CameraView cameraView) {
+        public void onCameraClosed(@Nullable CameraView cameraView) {
             Log.d(TAG, "Camera closed.");
         }
 
+        /**
+         * Called when a picture is taken.
+         * In a background thread, sends photo data to {@link ImageParser} to convert data into
+         * String equation and then sends results as {@link ImageParser.ImageParseResult}
+         * to {@link ParseResultMessageHandler} to handle results in main thread.
+         *
+         * @param cameraView The associated {@link CameraView}.
+         *                   This has been reported to be null on rare occasions,
+         *                   if an error occurs.
+         * @param data       JPEG data. Presumed to be nullable if an error occurs.
+         */
         @Override
-        public void onPictureTaken(CameraView cameraView, final byte[] data) {
-            Log.d(TAG, "Picture Taken." + data.length);
+        public void onPictureTaken(
+                @Nullable final CameraView cameraView,
+                @Nullable final byte[] data) {
+            // validate arguments.
+            if (cameraView == null) {
+                Log.w(TAG, "cameraCallback.onPictureTaken was passed null cameraView.");
+                return;
+            }
+            if (data == null) {
+                Log.w(TAG, "cameraCallback.onPictureTaken was passed null data.");
+                return;
+            }
+            Log.d(TAG, "Picture Taken. Size: " + data.length);
 
             getBackgroundHandler().post(() -> {
-                ImageParser.ImageParseResult result = imageParser.parse(data);
-                Message msg = new Message();
+                final ImageParser.ImageParseResult result = imageParser.parse(data);
+                final Message msg = new Message();
                 msg.what = IMAGE_PARSE_MESSAGE_CODE;
                 msg.obj = result;
                 if (parseResultMessageHandler != null) {
@@ -161,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * Handles clicks made on widgets within this activity.
      */
-    private final View.OnClickListener onClickListener = view -> {
+    private final View.OnClickListener onClickListener = (final View view) -> {
         switch (view.getId()) {
             case R.id.camera:
                 if (cameraView != null) {
@@ -178,9 +245,10 @@ public class MainActivity extends AppCompatActivity implements
      * processing, so that it does not interrupt the ui.
      * @return Handler
      */
+    @NonNull
     private Handler getBackgroundHandler() {
         if (backgroundHandler == null) {
-            HandlerThread thread = new HandlerThread("background");
+            final HandlerThread thread = new HandlerThread("background");
             thread.start();
             backgroundHandler = new Handler(thread.getLooper());
         }
@@ -205,13 +273,14 @@ public class MainActivity extends AppCompatActivity implements
          * @param notGrantedMessage: Message displayed if permission not granted.
          * @return ConfirmationDialogFragment created using passed arguments.
          */
+        @NonNull
         public static ConfirmationDialogFragment newInstance(
-                @StringRes int message,
-                String[] permissions,
-                int requestCode,
-                @StringRes int notGrantedMessage) {
-            ConfirmationDialogFragment fragment = new ConfirmationDialogFragment();
-            Bundle args = new Bundle();
+                @StringRes final int message,
+                @NonNull final String[] permissions,
+                final int requestCode,
+                @StringRes final int notGrantedMessage) {
+            final ConfirmationDialogFragment fragment = new ConfirmationDialogFragment();
+            final Bundle args = new Bundle();
             args.putInt(ARG_MESSAGE, message);
             args.putStringArray(ARG_PERMISSIONS, permissions);
             args.putInt(ARG_REQUEST_CODE, requestCode);
@@ -266,8 +335,9 @@ public class MainActivity extends AppCompatActivity implements
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case IMAGE_PARSE_MESSAGE_CODE:
-                    ImageParser.ImageParseResult result = (ImageParser.ImageParseResult) msg.obj;
-                    TextView equationReadout = activityReference.get().equationReadout;
+                    final ImageParser.ImageParseResult result =
+                            (ImageParser.ImageParseResult) msg.obj;
+                    final TextView equationReadout = activityReference.get().equationReadout;
                     if (equationReadout != null) {
                         equationReadout.setText(result.getEquation());
                     }
