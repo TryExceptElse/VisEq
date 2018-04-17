@@ -1,4 +1,4 @@
-package tryexceptelse.viseq;
+package tryexceptelse.viseq.model;
 
 /**
  * Tests functionality of ImageParser
