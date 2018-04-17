@@ -1,11 +1,18 @@
 package tryexceptelse.viseq.model;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.google.android.gms.vision.Frame;
 
 /**
  * Handles conversion from image to String equation.
  */
 public class ImageParser {
+    public static final double Y_PARSE_RATIO = 0.2;  // ratio of image height that is parsed.
+    public static final double X_PARSE_RATIO = 1.0;  // ratio of image width that is parsed.
 
     public ImageParser() {}
 
@@ -17,7 +24,24 @@ public class ImageParser {
      *          equation and other associated data.
      */
     public ImageParseResult parse(final byte[] data) {
+        // First get sub-section of image that is checked for equation
+        final Bitmap original = BitmapFactory.decodeByteArray(data, 0, data.length);
+        // create sub-bitmap from bitmap of region to be parsed.
+        final Bitmap croppedBitmap = cropBitmap(original);
+        // chunk sub-bitmap into chunk-bitmaps
+        final Frame frame = new Frame.Builder().setBitmap(croppedBitmap).build();
         return new ImageParseResult().setEquation("f(x) = 2x + 1");  // PLACEHOLDER
+    }
+
+    /**
+     * Produces cropped bitmap
+     * @param original: Bitmap of full image that is to be cropped.
+     * @return cropped Bitmap
+     */
+    @NonNull
+    private Bitmap cropBitmap(@NonNull final Bitmap original) {
+        // PLACEHOLDER
+        return Bitmap.createBitmap(original, 0, 0, original.getWidth(), original.getHeight());
     }
 
     /**
