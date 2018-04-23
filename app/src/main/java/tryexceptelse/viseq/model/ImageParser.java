@@ -7,8 +7,6 @@ import android.support.annotation.Nullable;
 
 import com.google.android.gms.vision.Frame;
 
-import static tryexceptelse.viseq.model.BitmapUtility.cropBitmapToRatio;
-
 /**
  * Handles conversion from image to String equation.
  */
@@ -29,9 +27,13 @@ public class ImageParser {
         // First get sub-section of image that is checked for equation
         final Bitmap original = BitmapFactory.decodeByteArray(data, 0, data.length);
         // create sub-bitmap from bitmap of region to be parsed.
-        final Bitmap croppedBitmap = cropBitmapToRatio(original, X_PARSE_RATIO, Y_PARSE_RATIO);
+        final Bitmap croppedBitmap = Bitmap.createBitmap(
+                original, 0, 0, original.getWidth(), original.getHeight());
         // chunk sub-bitmap into chunk-bitmaps
         final Frame frame = new Frame.Builder().setBitmap(croppedBitmap).build();
+        // pass frame to OCR
+
+
         return new ImageParseResult().setEquation("f(x) = 2x + 1");  // PLACEHOLDER
     }
 
