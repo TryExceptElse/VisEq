@@ -28,7 +28,11 @@ public class ImageParser {
         final Bitmap original = BitmapFactory.decodeByteArray(data, 0, data.length);
         // create sub-bitmap from bitmap of region to be parsed.
         final Bitmap croppedBitmap = Bitmap.createBitmap(
-                original, 0, 0, original.getWidth(), original.getHeight());
+                original,
+                0,
+                0,
+                (int)(original.getWidth() * Y_PARSE_RATIO),
+                (int)(original.getHeight() * X_PARSE_RATIO));
         // chunk sub-bitmap into chunk-bitmaps
         final Frame frame = new Frame.Builder().setBitmap(croppedBitmap).build();
         // pass frame to OCR
