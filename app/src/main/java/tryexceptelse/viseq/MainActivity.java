@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 1;
     private static final int IMAGE_PARSE_MESSAGE_CODE = 1;
 
-    private static final ImageParser imageParser = new ImageParser();
+    @Nullable private ImageParser imageParser;
     @Nullable private CameraView cameraView;
     @Nullable private TextView equationReadout;
     @Nullable private Handler backgroundHandler;
@@ -66,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements
         equationPlot.makeTransparent();
 
         parseResultMessageHandler = new ParseResultMessageHandler(this);
+
+        imageParser = new ImageParser(this);
     }
 
     /**
